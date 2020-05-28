@@ -12,6 +12,7 @@ int main(int argc, char **argv) {
     }
     int port = std::atoi(argv[1]);
 
+    // 默认4个线程
     int threadNum = 4;
     std::string logPath = "./log";
     
