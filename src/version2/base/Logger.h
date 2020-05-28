@@ -8,7 +8,7 @@
 
 class AsyncLogging;
 
-//对外接口，通过Impl来格式化日志，使用LogStream来写入缓冲区
+//对外接口(提供给1+4个IO线程)，通过Impl来格式化日志，使用LogStream来写入缓冲区
 class Logger {
 public:
     Logger(const char* fileName, int line);

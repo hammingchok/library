@@ -25,7 +25,7 @@ void once_init() {
  * LOG析构后将LogStream中的buffer压入，一个持有异步日志操作的线程进行异步的处理
  * */
 void output(const char *msg, int len) {
-    pthread_once(&once_control_, once_init); //线程只执行一次
+    pthread_once(&once_control_, once_init); //只执行一次(全局只会有一个异步日志对象)
     AsyncLogger_->append(msg, len); //将append后的currentBuffer压入buffers中
 }
 
