@@ -25,6 +25,7 @@ AsyncLogging::AsyncLogging(std::string logFileName_, int flushInterval):
         buffers_.reserve(16);
     }
 
+// ==>> 前端线程调用的函数，全局只有一个异步日志对象，前端线程将信息append到该对象的双缓存区中
 //当LOG << 析构时将写入的buffer追加到异步日志里
 //前端在生成一条日志消息时，会调用AsyncLogging::append()。
 //如果currentBuffer_够用，就把日志内容写入到currentBuffer_中，
@@ -55,6 +56,7 @@ void AsyncLogging::append(const char* logline, int len) {
 }
 
 
+// ==>> 后端线程调用的函数，将前端线程放到全局异步日志对象的双缓存区置换到后端线程的buffer中处理
 //如果buffers_为空，使用条件变量等待条件满足（即前端线程把一个已经满了
 //的buffer放到了buffers_中或者超时）。将当前缓冲区放到buffers_数组中。
 //更新当前缓冲区（currentBuffer_）和另一个缓冲区（nextBuffer_）。
@@ -86,7 +88,7 @@ void AsyncLogging::threadFunc() {
             MutexLockGuard lock(mutex_);
             //如果buffers_为空，那么表示没有数据需要写入文件，那么就等待指定的时间。
 	    if(buffers_.empty()) {
-                cond_.waitForSeconds(flushInterval_);
+                cond_.waitForSeconds(flushInterval_); //等待n秒
             }
 	    // 无论cond是因何（一是超时，二是当前缓冲区写满了）而醒来，都要将currentBuffer_放到buffers_中。  
             // 如果是因为时间到（3秒）而醒，那么currentBuffer_还没满，此时也要将之写入LogFile中。  
